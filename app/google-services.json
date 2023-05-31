@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "190554916886",
+    "project_id": "smile-try-one",
+    "storage_bucket": "smile-try-one.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:190554916886:android:064300450b05c0c5f04d37",
+        "android_client_info": {
+          "package_name": "com.example.smiletryone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPYL8tk_-78JdTItIu_YHppkzljgtGHCk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
