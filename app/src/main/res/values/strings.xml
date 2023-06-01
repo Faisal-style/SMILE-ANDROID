@@ -3,4 +3,7 @@
     <string name="menu">Menu</string>
     <string name="Hello_World">Hellon World</string>
     <string name="hello_from_nav_drawer">Hello From Navigation Drawer</string>
+    <string name="home">Home</string>
+    <string name="history">History</string>
+    <string name="logout">Logout</string>
 </resources>

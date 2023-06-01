@@ -12,14 +12,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.smiletryone.R
+import com.example.smiletryone.component.MyNavDrawerContent
 import com.example.smiletryone.component.MyTopAppBar
 import kotlinx.coroutines.launch
-import java.lang.reflect.Modifier
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun HomeScreen() {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
@@ -32,11 +35,14 @@ fun HomeScreen() {
             )
         },
         drawerContent = {
-            Text(stringResource(R.string.hello_from_nav_drawer))
-        }
+            MyNavDrawerContent(onItemSelected = {})
+        },
+        drawerGesturesEnabled = scaffoldState.drawerState.isOpen
     ) { paddingValues ->
         Box(
-            modifier = Modifier.fillMaxSize().padding(paddingValues),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
             Text(stringResource(R.string.Hello_World))
