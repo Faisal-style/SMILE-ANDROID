@@ -20,8 +20,11 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.smiletryone.R
+import com.example.smiletryone.navigation.Screen
 import com.example.smiletryone.ui.theme.Monda_Bold
 import com.example.smiletryone.ui.theme.Monda_Regular
 import com.example.smiletryone.ui.theme.PurplePurse
@@ -46,20 +49,24 @@ fun MyTopAppBar(onMenuClick: () -> Unit) {
 @Composable
 fun MyNavDrawerContent(
     modifier: Modifier = Modifier,
-    onItemSelected: (title: String) -> Unit
+    onItemSelected: (title: String) -> Unit,
+    navController: NavHostController
 ) {
     val items = listOf(
         MenuItem(
             title = stringResource(id = R.string.home),
-            icon = Icons.Default.Home
+            icon = Icons.Default.Home,
+            route = Screen.History.route
         ),
         MenuItem(
             title = stringResource(id = R.string.history),
-            icon = ImageVector.vectorResource(id = R.drawable.baseline_history_24)
+            icon = ImageVector.vectorResource(id = R.drawable.baseline_history_24),
+            route = Screen.History.route
         ),
         MenuItem(
             title = stringResource(id = R.string.logout),
-            icon = ImageVector.vectorResource(id = R.drawable.baseline_logout_24)
+            icon = ImageVector.vectorResource(id = R.drawable.baseline_logout_24),
+            route = Screen.History.route
         ),
     )
     Column(
@@ -105,7 +112,10 @@ fun MyNavDrawerContent(
         for (item in items) {
             Row(
                 modifier = Modifier
-                    .clickable { onItemSelected(item.title) }
+                    .clickable {
+                        onItemSelected(item.title)
+                        navController.navigate(item.route)
+                    }
                     .padding(vertical = 12.dp, horizontal = 16.dp)
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -113,6 +123,7 @@ fun MyNavDrawerContent(
                 Icon(imageVector = item.icon, contentDescription = item.title, tint = Color.Black)
                 Spacer(modifier = Modifier.width(32.dp))
                 Text(text = item.title, fontFamily = Monda_Regular)
+
             }
         }
         Divider()
