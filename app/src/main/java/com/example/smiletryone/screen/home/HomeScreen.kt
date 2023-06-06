@@ -1,5 +1,6 @@
 package com.example.smiletryone.screen.home
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,9 +18,13 @@ import com.example.smiletryone.component.MyTopAppBar
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    navController: NavHostController
+) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -35,7 +40,11 @@ fun HomeScreen() {
             )
         },
         drawerContent = {
-            MyNavDrawerContent(onItemSelected = {})
+            MyNavDrawerContent(onItemSelected = {title ->  
+                scope.launch {
+                    scaffoldState.drawerState.close()
+                }
+            }, navController = navController)
         },
         drawerGesturesEnabled = scaffoldState.drawerState.isOpen
     ) { paddingValues ->
@@ -51,9 +60,3 @@ fun HomeScreen() {
     }
 }
 
-
-@Composable
-@Preview(showBackground = true)
-fun AppBarPreview(){
-    HomeScreen()
-}
