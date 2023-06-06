@@ -17,6 +17,15 @@ val Monda_Bold = FontFamily(
 val Monda_Regular = FontFamily(
     Font(R.font.monda_regular),
 )
+val Poppins_Bold = FontFamily(
+    Font(R.font.poppins_bold)
+)
+val Poppins_Medium = FontFamily(
+    Font(R.font.poppins_medium)
+)
+val Poppins_SemiBold = FontFamily(
+    Font(R.font.poppins_semibold)
+)
 
 // Set of Material typography styles to start with
 val Typography = Typography(
