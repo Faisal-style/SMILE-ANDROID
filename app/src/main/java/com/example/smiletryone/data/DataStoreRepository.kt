@@ -2,10 +2,7 @@ package com.example.smiletryone.data
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -18,6 +15,7 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "on
 class DataStoreRepository(context: Context) {
     private object PreferenceKey {
         val onBoardingKey = booleanPreferencesKey(name = "on_boarding_completed")
+        val userToken = stringPreferencesKey(name = "user_token")
     }
 
     private val dataStore = context.dataStore
@@ -27,6 +25,12 @@ class DataStoreRepository(context: Context) {
             preferences[PreferenceKey.onBoardingKey] = completed
         }
     }
+    suspend fun saveUserToken(token: String) {
+        dataStore.edit { preferences ->
+            preferences[PreferenceKey.userToken] = token
+        }
+    }
+
     fun readOnBoardingState(): Flow<Boolean>{
         return dataStore.data
             .catch { exception ->
@@ -39,6 +43,20 @@ class DataStoreRepository(context: Context) {
             .map {preferences ->
                 val onBoardingState = preferences[PreferenceKey.onBoardingKey] ?: false
                 onBoardingState
+            }
+    }
+
+    fun readUserToken(): Flow<String?> {
+        return dataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }
+            .map { preferences ->
+                preferences[PreferenceKey.userToken]
             }
     }
 }
