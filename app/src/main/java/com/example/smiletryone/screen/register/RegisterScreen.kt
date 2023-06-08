@@ -3,12 +3,12 @@ package com.example.smiletryone.screen.register
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material.TextButton
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
@@ -17,6 +17,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.smiletryone.R
@@ -27,33 +29,142 @@ import com.example.smiletryone.navigation.Screen
 import com.example.smiletryone.screen.login.LoginTitle
 import com.example.smiletryone.screen.login.SignUp
 import com.example.smiletryone.ui.theme.PurplePurse
+import com.example.smiletryone.util.Resource
+import com.example.smiletryone.viewmodel.RegisterViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
-fun RegisterScreen(navController: NavHostController, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .paint(
-                painter = painterResource(id = R.drawable.img),
-                contentScale = ContentScale.FillBounds
-            )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .imePadding(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            RegisterTitle()
-            Spacer(modifier = Modifier.size(30.dp))
-            InputField()
-            Spacer(modifier = Modifier.size(10.dp))
-            SignIn(){
-                navController.navigate(Screen.Login.route)
+fun RegisterScreen(
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+    registerViewModel: RegisterViewModel = hiltViewModel()
+) {
+    var emailTextField by rememberSaveable {
+        mutableStateOf("")
+    }
+    var usernameTextField by rememberSaveable {
+        mutableStateOf("")
+    }
+    var passwordTextField by rememberSaveable {
+        mutableStateOf("")
+    }
+    var passwordTextField2 by rememberSaveable {
+        mutableStateOf("")
+    }
+    var snackbarVisible by remember { mutableStateOf(false) }
+    var snackbarMessage by remember { mutableStateOf("Email atau Password Salah") }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        content = { paddingValues ->
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .paint(
+                        painter = painterResource(id = R.drawable.img),
+                        contentScale = ContentScale.FillBounds
+                    )
+                    .padding(paddingValues)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .imePadding(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    RegisterTitle()
+                    Spacer(modifier = Modifier.size(30.dp))
+                    Column(
+                        modifier = modifier,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+
+                        TextFieldComponent(
+                            state = emailTextField,
+                            placeholder = "Email",
+                            onValueChange = { newValue -> emailTextField = newValue })
+
+                        Spacer(modifier = Modifier.size(8.dp))
+
+                        TextFieldComponent(
+                            state = usernameTextField,
+                            placeholder = "Username",
+                            onValueChange = { newValue -> usernameTextField = newValue })
+
+                        Spacer(modifier = Modifier.size(8.dp))
+
+                        TextFieldPasswordComponent(
+                            state = passwordTextField,
+                            onValueChange = { newPasswordValue ->
+                                passwordTextField = newPasswordValue
+                            },
+                            placeholder = "Password"
+                        )
+
+                        Spacer(modifier = Modifier.size(8.dp))
+
+                        TextFieldPasswordComponent(
+                            state = passwordTextField2,
+                            onValueChange = { newPasswordValue ->
+                                passwordTextField2 = newPasswordValue
+                            },
+                            placeholder = "Password"
+                        )
+
+                        Spacer(modifier = Modifier.size(8.dp))
+
+                        CustomButton(text = "Register") {
+                            registerViewModel.viewModelScope.launch {
+                                if (passwordTextField != passwordTextField2) {
+                                    snackbarMessage = "Password Tidak Sama"
+                                    snackbarVisible = true
+                                    delay(1000)
+                                    snackbarVisible = false
+                                }else{
+                                    val getRegister = registerViewModel.getRegisterInfo(emailTextField, passwordTextField, usernameTextField)
+                                    if (getRegister is Resource.Success){
+                                        snackbarMessage = "Register Berhasil"
+                                        snackbarVisible = true
+                                        delay(1000)
+                                        snackbarVisible = false
+                                        navController.navigate(Screen.Login.route)
+                                    }else{
+                                        snackbarMessage = "Register Gagal"
+                                        snackbarVisible = true
+                                        delay(1000)
+                                        snackbarVisible = false
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                    Spacer(modifier = Modifier.size(10.dp))
+                    SignIn() {
+                        navController.navigate(Screen.Login.route)
+                    }
+                }
+            }
+        },
+        snackbarHost = {
+            if (snackbarVisible) {
+                Snackbar(
+                    modifier = Modifier.padding(8.dp),
+                    action = {
+                        TextButton(onClick = { snackbarVisible = false }) {
+                            Text(text = "OK")
+                        }
+                    }
+                ) {
+                    Text(text = snackbarMessage)
+                }
             }
         }
-    }
+    )
+
 }
 
 @Composable
