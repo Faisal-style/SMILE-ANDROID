@@ -17,10 +17,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.smiletryone.R
@@ -28,6 +27,7 @@ import com.example.smiletryone.navigation.Screen
 import com.example.smiletryone.ui.theme.Monda_Bold
 import com.example.smiletryone.ui.theme.Monda_Regular
 import com.example.smiletryone.ui.theme.PurplePurse
+import com.example.smiletryone.viewmodel.HomeViewModel
 
 @Composable
 fun MyTopAppBar(onMenuClick: () -> Unit) {
@@ -50,7 +50,8 @@ fun MyTopAppBar(onMenuClick: () -> Unit) {
 fun MyNavDrawerContent(
     modifier: Modifier = Modifier,
     onItemSelected: (title: String) -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val items = listOf(
         MenuItem(
@@ -66,7 +67,7 @@ fun MyNavDrawerContent(
         MenuItem(
             title = stringResource(id = R.string.logout),
             icon = ImageVector.vectorResource(id = R.drawable.baseline_logout_24),
-            route = Screen.History.route
+            route = Screen.Login.route
         ),
     )
     Column(
@@ -113,8 +114,14 @@ fun MyNavDrawerContent(
             Row(
                 modifier = Modifier
                     .clickable {
-                        onItemSelected(item.title)
-                        navController.navigate(item.route)
+                        if (item.title == "Logout"){
+                            onItemSelected(item.title)
+                            homeViewModel.saveUserToken("")
+                            navController.navigate(item.route)
+                        }else{
+                            onItemSelected(item.title)
+                            navController.navigate(item.route)
+                        }
                     }
                     .padding(vertical = 12.dp, horizontal = 16.dp)
                     .fillMaxWidth(),
@@ -127,6 +134,5 @@ fun MyNavDrawerContent(
             }
         }
         Divider()
-
     }
 }
