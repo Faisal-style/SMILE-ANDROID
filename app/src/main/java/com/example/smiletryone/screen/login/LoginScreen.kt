@@ -1,16 +1,10 @@
 package com.example.smiletryone.screen.login
 
-import android.graphics.fonts.FontStyle
-import android.widget.Space
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.FabPosition
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -23,7 +17,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.smiletryone.R
 import com.example.smiletryone.component.CustomButton
@@ -31,37 +26,122 @@ import com.example.smiletryone.component.TextFieldComponent
 import com.example.smiletryone.component.TextFieldPasswordComponent
 import com.example.smiletryone.navigation.Screen
 import com.example.smiletryone.ui.theme.PurplePurse
+import com.example.smiletryone.viewmodel.LoginViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+
 
 @Composable
 fun LoginScreen(
     navController: NavHostController,
     modifier: Modifier = Modifier,
+    loginViewModel: LoginViewModel = hiltViewModel()
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .paint(
-                painter = painterResource(id = R.drawable.img),
-                contentScale = ContentScale.FillBounds
-            )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .imePadding(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            LoginTitle()
-            Spacer(modifier = Modifier.size(30.dp))
-            InputField()
-            Spacer(modifier = Modifier.size(10.dp))
-            SignUp(){
-                navController.navigate(Screen.Register.route)
-            }
+    var emailTextField by rememberSaveable {
+        mutableStateOf("")
+    }
+    var passwordTextField by rememberSaveable {
+        mutableStateOf("")
+    }
+    val isLoading by remember { loginViewModel.isLoading }
+    var snackbarVisible by remember { mutableStateOf(false) }
+    var snackbarMessage by remember { mutableStateOf("Email atau Password Salah") }
+
+    val token = loginViewModel.token.value
+    val homeDestination = loginViewModel.homeDestination.value
+
+    LaunchedEffect(key1 = token) {
+        if (token.isNotBlank()) {
+            navController.navigate(homeDestination)
         }
     }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        content = { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .paint(
+                        painter = painterResource(id = R.drawable.img),
+                        contentScale = ContentScale.FillBounds
+                    )
+                    .padding(paddingValues)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .imePadding(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    LoginTitle()
+                    Spacer(modifier = Modifier.size(30.dp))
+                    Column(
+                        modifier = modifier,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        TextFieldComponent(
+                            state = emailTextField,
+                            placeholder = "Email",
+                            onValueChange = { newValue -> emailTextField = newValue })
+                        Spacer(modifier = Modifier.size(8.dp))
+                        TextFieldPasswordComponent(
+                            state = passwordTextField,
+                            onValueChange = { newPasswordValue ->
+                                passwordTextField = newPasswordValue
+                            },
+                            placeholder = "Password"
+                        )
+                        Spacer(modifier = Modifier.size(8.dp))
+                        CustomButton(text = "Login") {
+                            loginViewModel.viewModelScope.launch {
+                                loginViewModel.getLoginInfo(emailTextField, passwordTextField)
+                                val userToken = loginViewModel.loginData.value?.loginResult?.accessToken
+                                if (userToken != null) {
+                                    loginViewModel.saveUserToken(userToken)
+                                }else{
+                                    snackbarVisible = true
+                                    snackbarMessage = "Email atau password Salah"
+                                    delay(1000)
+                                    snackbarVisible = false
+                                }
+
+                            }
+                        }
+                        if(isLoading) {
+                            CircularProgressIndicator(color = MaterialTheme.colors.primary)
+                        }
+
+                    }
+
+                    Spacer(modifier = Modifier.size(10.dp))
+                    SignUp() {
+                        navController.navigate(Screen.Register.route)
+                    }
+                }
+            }
+        },
+        snackbarHost = {
+            if (snackbarVisible) {
+                Snackbar(
+                    modifier = Modifier.padding(8.dp),
+                    action = {
+                        TextButton(onClick = { snackbarVisible = false }) {
+                            Text(text = "OK")
+                        }
+                    }
+                ) {
+                    Text(text = snackbarMessage)
+                }
+            }
+        }
+    )
 }
+
+
 
 
 @Composable
@@ -85,38 +165,9 @@ fun LoginTitle(modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-fun InputField(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        var emailTextField by rememberSaveable {
-            mutableStateOf("")
-        }
-        var passwordTextField by rememberSaveable {
-            mutableStateOf("")
-        }
-        TextFieldComponent(
-            state = emailTextField,
-            placeholder = "Email",
-            onValueChange = { newValue -> emailTextField = newValue })
-        Spacer(modifier = Modifier.size(8.dp))
-        TextFieldPasswordComponent(
-            state = passwordTextField,
-            onValueChange = { newPasswordValue -> passwordTextField = newPasswordValue },
-            placeholder = "Password"
-        )
-        Spacer(modifier = Modifier.size(8.dp))
-        CustomButton(text = "Login") {
-            println("Login Text $emailTextField")
-        }
-    }
-}
 
 @Composable
-fun SignUp(modifier: Modifier = Modifier, navigateToRegister: ()-> Unit) {
+fun SignUp(modifier: Modifier = Modifier, navigateToRegister: () -> Unit) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -127,3 +178,4 @@ fun SignUp(modifier: Modifier = Modifier, navigateToRegister: ()-> Unit) {
         Text(text = "Sign up Here", modifier = Modifier.clickable { navigateToRegister() })
     }
 }
+
