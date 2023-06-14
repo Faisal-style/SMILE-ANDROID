@@ -16,6 +16,7 @@ class DataStoreRepository(context: Context) {
     private object PreferenceKey {
         val onBoardingKey = booleanPreferencesKey(name = "on_boarding_completed")
         val userToken = stringPreferencesKey(name = "user_token")
+        val idUser = intPreferencesKey(name = "user_id")
     }
 
     private val dataStore = context.dataStore
@@ -25,22 +26,29 @@ class DataStoreRepository(context: Context) {
             preferences[PreferenceKey.onBoardingKey] = completed
         }
     }
+
     suspend fun saveUserToken(token: String) {
         dataStore.edit { preferences ->
             preferences[PreferenceKey.userToken] = token
         }
     }
 
-    fun readOnBoardingState(): Flow<Boolean>{
+    suspend fun saveUserId(id: Int) {
+        dataStore.edit { preferences ->
+            preferences[PreferenceKey.idUser] = id
+        }
+    }
+
+    fun readOnBoardingState(): Flow<Boolean> {
         return dataStore.data
             .catch { exception ->
-                if (exception is IOException){
+                if (exception is IOException) {
                     emit(emptyPreferences())
-                }else{
+                } else {
                     throw exception
                 }
             }
-            .map {preferences ->
+            .map { preferences ->
                 val onBoardingState = preferences[PreferenceKey.onBoardingKey] ?: false
                 onBoardingState
             }
@@ -57,6 +65,20 @@ class DataStoreRepository(context: Context) {
             }
             .map { preferences ->
                 preferences[PreferenceKey.userToken]
+            }
+    }
+
+    fun readUserId(): Flow<Int?> {
+        return dataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }
+            .map { preferences ->
+                preferences[PreferenceKey.idUser]
             }
     }
 }

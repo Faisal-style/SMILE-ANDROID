@@ -1,11 +1,13 @@
 package com.example.smiletryone.data.remote
 
-import com.example.smiletryone.data.remote.responses.LoginResponse
-import com.example.smiletryone.data.remote.responses.RegisterResponse
+import com.example.smiletryone.data.remote.responses.*
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface SmileApi {
 
@@ -23,4 +25,22 @@ interface SmileApi {
         @Field("password") password: String,
         @Field("userName") username: String
     ): RegisterResponse
+
+    @GET("user/{id}")
+    suspend fun postDetailUser(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+    ): DetailUserResponse
+
+    @FormUrlEncoded
+    @POST("chat")
+    suspend fun sendChat(
+        @Header("Authorization") token: String,
+        @Field("question") question: String
+    ): ChatResponse
+
+    @GET("chat")
+    suspend fun getChat(
+        @Header("Authorization") token: String,
+    ): GetChatResponse
 }

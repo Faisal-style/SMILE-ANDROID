@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.smiletryone.screen.detail.DetailUserScreen
 import com.example.smiletryone.screen.history.HistoryScreen
 import com.example.smiletryone.screen.home.HomeScreen
 import com.example.smiletryone.screen.login.LoginScreen
@@ -39,6 +40,10 @@ fun SetupNavGraph(
         composable(route = Screen.SplashScreen.route){
             SplashScreen()
         }
+        composable(route = Screen.DetailUserScreen.route){
+            DetailUserScreen(navController = navController)
+        }
+        
         
     }
 }

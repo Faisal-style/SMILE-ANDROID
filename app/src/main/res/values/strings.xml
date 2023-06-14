@@ -7,4 +7,6 @@
     <string name="history">History</string>
     <string name="logout">Logout</string>
     <string name="history_screen">HISTORY</string>
+    <string name="detail_user">PROFILE</string>
+    <string name="profile">Profile</string>
 </resources>

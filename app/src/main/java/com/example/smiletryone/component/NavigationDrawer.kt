@@ -8,7 +8,9 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,10 +25,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.smiletryone.R
+import com.example.smiletryone.data.remote.responses.DetailUserResponse
 import com.example.smiletryone.navigation.Screen
 import com.example.smiletryone.ui.theme.Monda_Bold
 import com.example.smiletryone.ui.theme.Monda_Regular
 import com.example.smiletryone.ui.theme.PurplePurse
+import com.example.smiletryone.util.Resource
 import com.example.smiletryone.viewmodel.HomeViewModel
 
 @Composable
@@ -53,11 +57,21 @@ fun MyNavDrawerContent(
     navController: NavHostController,
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
+    val detailUserInfo =
+        produceState<Resource<DetailUserResponse>>(initialValue = Resource.Loading()) {
+            value = homeViewModel.getUserDetailInfo()
+        }.value
+    var image by rememberSaveable {
+        mutableStateOf("https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?w=2000")
+    }
+    if (detailUserInfo.data?.data?.image != null) {
+        image = detailUserInfo.data.data.image.toString()
+    }
     val items = listOf(
         MenuItem(
-            title = stringResource(id = R.string.home),
-            icon = Icons.Default.Home,
-            route = Screen.History.route
+            title = stringResource(id = R.string.profile),
+            icon = Icons.Default.Person,
+            route = Screen.DetailUserScreen.route
         ),
         MenuItem(
             title = stringResource(id = R.string.history),
@@ -78,6 +92,7 @@ fun MyNavDrawerContent(
                 .height(220.dp)
                 .fillMaxWidth()
                 .background(MaterialTheme.colors.primary)
+                .clickable { navController.navigate(Screen.DetailUserScreen.route) },
         ) {
             Column(
                 modifier = Modifier
@@ -85,7 +100,7 @@ fun MyNavDrawerContent(
                 horizontalAlignment = Alignment.Start
             ) {
                 AsyncImage(
-                    model = "https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?w=2000",
+                    model = image,
                     contentDescription = "Avtar Image",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -93,20 +108,28 @@ fun MyNavDrawerContent(
                         .clip(CircleShape)
 
                 )
-                Text(
-                    text = "Zidan Noor Irfan Kontol",
-                    fontSize = 20.sp,
-                    color = Color.White,
-                    fontFamily = Monda_Bold,
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                )
-                Text(
-                    text = "zidan@gmail.com",
-                    fontSize = 15.sp,
-                    color = Color.White,
-                    fontFamily = Monda_Regular,
-                )
+
+                detailUserInfo.data?.data?.let {
+                    Text(
+                        text = it.email,
+                        fontSize = 20.sp,
+                        color = Color.White,
+                        fontFamily = Monda_Bold,
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                    )
+                }
+
+
+                detailUserInfo.data?.data?.let {
+                    Text(
+                        text = it.fullName,
+                        fontSize = 15.sp,
+                        color = Color.White,
+                        fontFamily = Monda_Regular,
+                    )
+                }
+
             }
 
         }
@@ -114,11 +137,16 @@ fun MyNavDrawerContent(
             Row(
                 modifier = Modifier
                     .clickable {
-                        if (item.title == "Logout"){
+                        if (item.title == "Logout") {
                             onItemSelected(item.title)
-                            homeViewModel.saveUserToken("")
+                            navController.popBackStack()
                             navController.navigate(item.route)
-                        }else{
+                            homeViewModel.saveUserToken("")
+                            homeViewModel.saveUserId(0)
+                        } else if (item.title == "Profile") {
+                            onItemSelected(item.title)
+                            navController.navigate(item.route)
+                        } else {
                             onItemSelected(item.title)
                             navController.navigate(item.route)
                         }

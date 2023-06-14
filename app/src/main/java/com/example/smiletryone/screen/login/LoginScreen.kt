@@ -31,7 +31,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-
 @Composable
 fun LoginScreen(
     navController: NavHostController,
@@ -99,10 +98,14 @@ fun LoginScreen(
                         CustomButton(text = "Login") {
                             loginViewModel.viewModelScope.launch {
                                 loginViewModel.getLoginInfo(emailTextField, passwordTextField)
-                                val userToken = loginViewModel.loginData.value?.loginResult?.accessToken
-                                if (userToken != null) {
+                                val userToken =
+                                    loginViewModel.loginData.value?.loginResult?.accessToken
+                                val userId = loginViewModel.loginData.value?.loginResult?.id
+                                println(userId)
+                                if (userToken != null && userId != null) {
                                     loginViewModel.saveUserToken(userToken)
-                                }else{
+                                    loginViewModel.saveUserId(userId)
+                                } else {
                                     snackbarVisible = true
                                     snackbarMessage = "Email atau password Salah"
                                     delay(1000)
@@ -111,7 +114,7 @@ fun LoginScreen(
 
                             }
                         }
-                        if(isLoading) {
+                        if (isLoading) {
                             CircularProgressIndicator(color = MaterialTheme.colors.primary)
                         }
 
@@ -140,8 +143,6 @@ fun LoginScreen(
         }
     )
 }
-
-
 
 
 @Composable

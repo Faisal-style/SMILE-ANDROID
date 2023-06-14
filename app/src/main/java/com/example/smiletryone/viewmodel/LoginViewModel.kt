@@ -31,11 +31,11 @@ class LoginViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            dataRepository.readUserToken().collect{userToken ->
-                if (userToken != null){
+            dataRepository.readUserToken().collect { userToken ->
+                if (userToken != null) {
                     _homeDestination.value = Screen.Home.route
                     token.value = userToken
-                }else{
+                } else {
                     _homeDestination.value = Screen.Login.route
                 }
 
@@ -43,16 +43,22 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun saveUserToken(token: String){
+    fun saveUserToken(token: String) {
         viewModelScope.launch(Dispatchers.IO) {
             dataRepository.saveUserToken(token = token)
         }
     }
 
-    suspend fun getLoginInfo(email : String, password: String){
+    fun saveUserId(id: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dataRepository.saveUserId(id = id)
+        }
+    }
+
+    suspend fun getLoginInfo(email: String, password: String) {
         isLoading.value = true
         val result = smileRepository.getLogin(email, password)
-        when(result){
+        when (result) {
             is Resource.Success -> {
                 loginData.value = result.data
                 isLoading.value = false
