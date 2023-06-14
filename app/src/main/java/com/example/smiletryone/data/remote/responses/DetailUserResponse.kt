@@ -4,8 +4,8 @@ import com.google.gson.annotations.SerializedName
 
 data class DetailUserResponse(
 
-	@field:SerializedName("data")
-	val data: Data,
+	@field:SerializedName("userResult")
+	val userResult: UserResult,
 
 	@field:SerializedName("message")
 	val message: String,
@@ -14,16 +14,16 @@ data class DetailUserResponse(
 	val status: String
 )
 
-data class Data(
+data class UserResult(
 
 	@field:SerializedName("image")
-	val image: Any,
-
-	@field:SerializedName("fullName")
-	val fullName: String,
+	val image: String,
 
 	@field:SerializedName("id")
 	val id: Int,
+
+	@field:SerializedName("userName")
+	val userName: String,
 
 	@field:SerializedName("email")
 	val email: String

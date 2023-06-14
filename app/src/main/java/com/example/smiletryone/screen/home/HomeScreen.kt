@@ -12,18 +12,17 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import com.example.smiletryone.component.MyNavDrawerContent
-import com.example.smiletryone.component.MyTopAppBar
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.smiletryone.component.TextInput
-import com.example.smiletryone.data.remote.responses.DataItem
+import com.example.smiletryone.component.*
+import com.example.smiletryone.data.remote.responses.ChatResultItem
 import com.example.smiletryone.ui.theme.BackGroundMessageBot
 import com.example.smiletryone.ui.theme.BackGroundMessageHuman
 import com.example.smiletryone.ui.theme.ColorTextBot
@@ -34,49 +33,63 @@ import com.example.smiletryone.viewmodel.HomeViewModel
 @Composable
 fun HomeScreen(
     navController: NavHostController,
+    modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel = hiltViewModel(),
-    chatViewModel: ChatViewModel = hiltViewModel()
+    chatViewModel: ChatViewModel = hiltViewModel(),
 ) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+    val isLoading by remember { homeViewModel.isLoading }
 
-    Scaffold(
-        scaffoldState = scaffoldState,
-        topBar = {
-            MyTopAppBar(
-                onMenuClick = {
-                    scope.launch {
-                        scaffoldState.drawerState.open()
+    Box(modifier = modifier.fillMaxSize()) {
+        Scaffold(
+            scaffoldState = scaffoldState,
+            topBar = {
+                MyTopAppBar(
+                    onMenuClick = {
+                        scope.launch {
+                            scaffoldState.drawerState.open()
+                        }
                     }
-                }
-            )
-        },
-        drawerContent = {
-            MyNavDrawerContent(onItemSelected = { title ->
-                scope.launch {
-                    scaffoldState.drawerState.close()
-                }
-            }, navController = navController)
-        },
-        drawerGesturesEnabled = scaffoldState.drawerState.isOpen
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(Modifier.fillMaxSize()) {
-                MessageList(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp),
-                    chatViewModel
                 )
-                TextInput(chatViewModel)
+            },
+            drawerContent = {
+                MyNavDrawerContent(onItemSelected = { title ->
+                    scope.launch {
+                        scaffoldState.drawerState.close()
+                    }
+                }, navController = navController)
+            },
+            drawerGesturesEnabled = scaffoldState.drawerState.isOpen
+        ) { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(Modifier.fillMaxSize()) {
+                    MessageList(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        chatViewModel
+                    )
+                    TextInput(chatViewModel)
+                }
+            }
+
+        }
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                GifSmile(modifier = Modifier.size(100.dp))
             }
         }
-
     }
 }
 
@@ -90,7 +103,14 @@ fun MessageList(
 ) {
     val scope = rememberCoroutineScope()
     scope.launch {
-        chatViewModel.getChat()
+        if (chatViewModel.conversationId.value == null) {
+            chatViewModel.newConversation()
+        } else if (chatViewModel.conversationId.value == 0) {
+            chatViewModel.newConversation()
+        } else {
+            chatViewModel.getChat()
+        }
+
     }
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -106,7 +126,7 @@ fun MessageList(
             state = listState,
         ) {
             coroutineScope.launch {
-                listState.animateScrollToItem(chatItems.size )
+                listState.animateScrollToItem(chatItems.size)
             }
             items(chatItems) { chatItem ->
                 MessageCard(message = chatItem, isHuman = true)
@@ -118,7 +138,7 @@ fun MessageList(
 }
 
 @Composable
-fun MessageCard(message: DataItem, isHuman: Boolean = false, isLast: Boolean = false) {
+fun MessageCard(message: ChatResultItem, isHuman: Boolean = false, isLast: Boolean = false) {
     Column(
         horizontalAlignment = if (isHuman) Alignment.End else Alignment.Start,
         modifier = Modifier
@@ -144,7 +164,7 @@ fun MessageCard(message: DataItem, isHuman: Boolean = false, isLast: Boolean = f
 }
 
 @Composable
-fun HumanMessageCard(message: DataItem) {
+fun HumanMessageCard(message: ChatResultItem) {
     Text(
         text = message.question,
         fontSize = 14.sp,
@@ -155,12 +175,23 @@ fun HumanMessageCard(message: DataItem) {
 }
 
 @Composable
-fun BotMessageCard(message: DataItem) {
-    Text(
-        text = message.reply,
-        fontSize = 14.sp,
-        color = ColorTextBot,
-        modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp),
-        textAlign = TextAlign.Justify,
-    )
+fun BotMessageCard(message: ChatResultItem) {
+    if (message.reply == "") {
+        Text(
+            text = "Let me thinking........",
+            fontSize = 14.sp,
+            color = ColorTextBot,
+            modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp),
+            textAlign = TextAlign.Justify,
+        )
+    } else {
+        Text(
+            text = message.reply,
+            fontSize = 14.sp,
+            color = ColorTextBot,
+            modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp),
+            textAlign = TextAlign.Justify,
+        )
+    }
+
 }

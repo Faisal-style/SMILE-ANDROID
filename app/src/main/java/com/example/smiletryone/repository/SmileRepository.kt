@@ -33,11 +33,10 @@ class SmileRepository @Inject constructor(
     }
 
     suspend fun getDetailUser(
-        token: String,
-        id: String
+        token: String
     ): Resource<DetailUserResponse> {
         val response = try {
-            api.postDetailUser(token, id)
+            api.postDetailUser(token)
         } catch (e: Exception) {
             return Resource.Error("An Unknown error ocurred. $e")
         }
@@ -46,10 +45,11 @@ class SmileRepository @Inject constructor(
 
     suspend fun sendChat(
         token: String,
+        conversationId: String,
         message: String
-    ): Resource<ChatResponse>{
+    ): Resource<SendChatResponse>{
         val response = try {
-            api.sendChat(token, message)
+            api.sendChat(token, conversationId, message)
         } catch (e: Exception){
             return Resource.Error("An Unkonwn error ocurred. $e")
         }
@@ -57,10 +57,41 @@ class SmileRepository @Inject constructor(
     }
 
     suspend fun getChat(
-        token: String
+        token: String,
+        conversationId : String
     ): Resource<GetChatResponse>{
         val response = try{
-            api.getChat(token)
+            api.getChat(token, conversationId)
+        }catch (e: Exception){
+            return Resource.Error("An Unknown error ocurred. $e")
+        }
+        return Resource.Success(response)
+    }
+
+    suspend fun createConversation(token: String): Resource<CreateConversationResponse>{
+        val response = try{
+            api.createConversation(token)
+        }catch (e: Exception){
+            return Resource.Error("An Unknown error ocurred. $e")
+        }
+        return Resource.Success(response)
+    }
+
+    suspend fun getConversation(token: String): Resource<GetConversationResponse>{
+        val response = try{
+            api.getConversation(token)
+        }catch (e: Exception){
+            return Resource.Error("An Unknown error ocurred. $e")
+        }
+        return Resource.Success(response)
+    }
+
+    suspend fun deleteConversation(
+        token: String,
+        conversationId : String
+    ): Resource<DeleteConversationResponse>{
+        val response = try{
+            api.deleteConversation(token, conversationId)
         }catch (e: Exception){
             return Resource.Error("An Unknown error ocurred. $e")
         }

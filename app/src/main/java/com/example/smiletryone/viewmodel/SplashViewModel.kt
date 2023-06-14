@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.smiletryone.data.DataStoreRepository
 import com.example.smiletryone.navigation.Screen
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,8 +26,10 @@ class SplashViewModel @Inject constructor(
         viewModelScope.launch {
             repository.readOnBoardingState().collect { completed ->
                 if (completed) {
+                    delay(2000)
                     _startDestination.value = Screen.Login.route
                 } else {
+                    delay(2000)
                     _startDestination.value = Screen.Welcome.route
                 }
             }

@@ -1,7 +1,9 @@
 package com.example.smiletryone.screen.login
 
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -12,7 +14,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -22,6 +26,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.smiletryone.R
 import com.example.smiletryone.component.CustomButton
+import com.example.smiletryone.component.GifSmile
 import com.example.smiletryone.component.TextFieldComponent
 import com.example.smiletryone.component.TextFieldPasswordComponent
 import com.example.smiletryone.navigation.Screen
@@ -37,6 +42,7 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
+
     var emailTextField by rememberSaveable {
         mutableStateOf("")
     }
@@ -55,93 +61,98 @@ fun LoginScreen(
             navController.navigate(homeDestination)
         }
     }
-
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        content = { paddingValues ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .paint(
-                        painter = painterResource(id = R.drawable.img),
-                        contentScale = ContentScale.FillBounds
-                    )
-                    .padding(paddingValues)
-            ) {
-                Column(
+    Box(modifier = modifier.fillMaxSize()) {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            content = { paddingValues ->
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .imePadding(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                        .paint(
+                            painter = painterResource(id = R.drawable.img),
+                            contentScale = ContentScale.FillBounds
+                        )
+                        .padding(paddingValues)
                 ) {
-                    LoginTitle()
-                    Spacer(modifier = Modifier.size(30.dp))
                     Column(
-                        modifier = modifier,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .imePadding(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        TextFieldComponent(
-                            state = emailTextField,
-                            placeholder = "Email",
-                            onValueChange = { newValue -> emailTextField = newValue })
-                        Spacer(modifier = Modifier.size(8.dp))
-                        TextFieldPasswordComponent(
-                            state = passwordTextField,
-                            onValueChange = { newPasswordValue ->
-                                passwordTextField = newPasswordValue
-                            },
-                            placeholder = "Password"
-                        )
-                        Spacer(modifier = Modifier.size(8.dp))
-                        CustomButton(text = "Login") {
-                            loginViewModel.viewModelScope.launch {
-                                loginViewModel.getLoginInfo(emailTextField, passwordTextField)
-                                val userToken =
-                                    loginViewModel.loginData.value?.loginResult?.accessToken
-                                val userId = loginViewModel.loginData.value?.loginResult?.id
-                                println(userId)
-                                if (userToken != null && userId != null) {
-                                    loginViewModel.saveUserToken(userToken)
-                                    loginViewModel.saveUserId(userId)
-                                } else {
-                                    snackbarVisible = true
-                                    snackbarMessage = "Email atau password Salah"
-                                    delay(1000)
-                                    snackbarVisible = false
-                                }
+                        LoginTitle()
+                        Spacer(modifier = Modifier.size(30.dp))
+                        Column(
+                            modifier = modifier,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            TextFieldComponent(
+                                state = emailTextField,
+                                placeholder = "Email",
+                                onValueChange = { newValue -> emailTextField = newValue })
+                            Spacer(modifier = Modifier.size(8.dp))
+                            TextFieldPasswordComponent(
+                                state = passwordTextField,
+                                onValueChange = { newPasswordValue ->
+                                    passwordTextField = newPasswordValue
+                                },
+                                placeholder = "Password"
+                            )
+                            Spacer(modifier = Modifier.size(8.dp))
+                            CustomButton(text = "Login") {
+                                loginViewModel.viewModelScope.launch {
+                                    loginViewModel.getLoginInfo(emailTextField, passwordTextField)
+                                    val userToken =
+                                        loginViewModel.loginData.value?.loginResult?.accessToken
+                                    val userId = loginViewModel.loginData.value?.loginResult?.id
+                                    println(userId)
+                                    if (userToken != null) {
+                                        loginViewModel.saveUserToken(userToken)
+                                    } else {
+                                        snackbarVisible = true
+                                        snackbarMessage = "Email atau password Salah"
+                                        delay(1000)
+                                        snackbarVisible = false
+                                    }
 
+                                }
                             }
                         }
-                        if (isLoading) {
-                            CircularProgressIndicator(color = MaterialTheme.colors.primary)
+                        Spacer(modifier = Modifier.size(10.dp))
+                        SignUp() {
+                            navController.navigate(Screen.Register.route)
                         }
-
                     }
-
-                    Spacer(modifier = Modifier.size(10.dp))
-                    SignUp() {
-                        navController.navigate(Screen.Register.route)
+                }
+            },
+            snackbarHost = {
+                if (snackbarVisible) {
+                    Snackbar(
+                        modifier = Modifier.padding(8.dp),
+                        action = {
+                            TextButton(onClick = { snackbarVisible = false }) {
+                                Text(text = "OK")
+                            }
+                        }
+                    ) {
+                        Text(text = snackbarMessage)
                     }
                 }
             }
-        },
-        snackbarHost = {
-            if (snackbarVisible) {
-                Snackbar(
-                    modifier = Modifier.padding(8.dp),
-                    action = {
-                        TextButton(onClick = { snackbarVisible = false }) {
-                            Text(text = "OK")
-                        }
-                    }
-                ) {
-                    Text(text = snackbarMessage)
-                }
+        )
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                GifSmile(modifier = Modifier.size(100.dp))
             }
         }
-    )
+    }
 }
 
 
@@ -154,10 +165,11 @@ fun LoginTitle(modifier: Modifier = Modifier) {
             text = "S.M.I.L.E",
             fontFamily = PurplePurse,
             fontWeight = FontWeight.Bold,
-            fontSize = 40.sp
+            fontSize = 40.sp,
+            color = colorResource(id = R.color.logo_login_color)
         )
         Image(
-            painter = painterResource(id = R.drawable.login_image),
+            painter = painterResource(id = R.drawable.logo_only),
             contentDescription = "Login Image",
             modifier = Modifier
                 .width(180.dp)

@@ -16,7 +16,7 @@ class DataStoreRepository(context: Context) {
     private object PreferenceKey {
         val onBoardingKey = booleanPreferencesKey(name = "on_boarding_completed")
         val userToken = stringPreferencesKey(name = "user_token")
-        val idUser = intPreferencesKey(name = "user_id")
+        val idConversation = intPreferencesKey(name = "conversation_id")
     }
 
     private val dataStore = context.dataStore
@@ -33,9 +33,9 @@ class DataStoreRepository(context: Context) {
         }
     }
 
-    suspend fun saveUserId(id: Int) {
+    suspend fun saveConversationId(id: Int) {
         dataStore.edit { preferences ->
-            preferences[PreferenceKey.idUser] = id
+            preferences[PreferenceKey.idConversation] = id
         }
     }
 
@@ -68,7 +68,7 @@ class DataStoreRepository(context: Context) {
             }
     }
 
-    fun readUserId(): Flow<Int?> {
+    fun readConversationId(): Flow<Int?> {
         return dataStore.data
             .catch { exception ->
                 if (exception is IOException) {
@@ -78,7 +78,7 @@ class DataStoreRepository(context: Context) {
                 }
             }
             .map { preferences ->
-                preferences[PreferenceKey.idUser]
+                preferences[PreferenceKey.idConversation]
             }
     }
 }

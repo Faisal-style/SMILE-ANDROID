@@ -2,10 +2,10 @@ package com.example.smiletryone.data.remote.responses
 
 import com.google.gson.annotations.SerializedName
 
-data class ChatResponse(
+data class CreateConversationResponse(
 
 	@field:SerializedName("data")
-	val chatResult: ChatResult,
+	val data: Data,
 
 	@field:SerializedName("message")
 	val message: String,
@@ -14,22 +14,19 @@ data class ChatResponse(
 	val status: String
 )
 
-data class ChatResult(
+data class Data(
 
 	@field:SerializedName("createdAt")
 	val createdAt: String,
 
-	@field:SerializedName("question")
-	val question: String,
-
-	@field:SerializedName("sender")
-	val sender: Int,
-
 	@field:SerializedName("id")
 	val id: Int,
 
-	@field:SerializedName("reply")
-	val reply: String,
+	@field:SerializedName("id_user")
+	val idUser: Int,
+
+	@field:SerializedName("title")
+	val title: String,
 
 	@field:SerializedName("updatedAt")
 	val updatedAt: String

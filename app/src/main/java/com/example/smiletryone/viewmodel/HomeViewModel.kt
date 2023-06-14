@@ -7,10 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.smiletryone.data.DataStoreRepository
 import com.example.smiletryone.data.remote.responses.DetailUserResponse
+import com.example.smiletryone.navigation.Screen
 import com.example.smiletryone.repository.SmileRepository
 import com.example.smiletryone.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,32 +25,39 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _userToken: MutableState<String> = mutableStateOf("")
-     val userToken: State<String> = _userToken
+    private val userToken: State<String> = _userToken
 
-    private val _userId: MutableState<Int?> = mutableStateOf(null)
-    val userId: State<Int?> = _userId
+    private val _route: MutableState<String> = mutableStateOf("")
+    val route: State<String> = _route
+
+    private val _conversationId: MutableState<Int?> = mutableStateOf(null)
+
+    var isLoading = mutableStateOf(false)
 
     fun saveUserToken(token: String) {
         viewModelScope.launch(Dispatchers.IO) {
             dataStoreRepository.saveUserToken(token = token)
         }
     }
-    fun saveUserId(id: Int) {
+
+    fun saveConversationId(conversationId: Int?) {
         viewModelScope.launch(Dispatchers.IO) {
-            dataStoreRepository.saveUserId(id = id)
+            if (conversationId != null) {
+                dataStoreRepository.saveConversationId(conversationId)
+            }
         }
     }
 
     init {
         viewModelScope.launch {
             combine(
-                dataStoreRepository.readUserId(),
+                dataStoreRepository.readConversationId(),
                 dataStoreRepository.readUserToken()
-            ) { userId, userToken ->
-                userId to userToken
-            }.collect { (userId, userToken) ->
-                if (userId != null) {
-                    _userId.value = userId
+            ) { conversationId, userToken ->
+                conversationId to userToken
+            }.collect { (conversationId, userToken) ->
+                if (conversationId != null) {
+                    _conversationId.value = conversationId
                 }
                 if (userToken != null) {
                     _userToken.value = userToken
@@ -58,7 +67,19 @@ class HomeViewModel @Inject constructor(
     }
 
     suspend fun getUserDetailInfo(): Resource<DetailUserResponse> {
-        return smileRepository.getDetailUser("Bearer ${userToken.value}", "${userId.value}")
+        isLoading.value = true
+        val response = smileRepository.getDetailUser("Bearer ${userToken.value}")
+        isLoading.value = false
+        return response
+    }
+
+    suspend fun logout() {
+        isLoading.value = true
+        saveUserToken("")
+        saveConversationId(0)
+        delay(1000)
+        isLoading.value = false
+        _route.value = Screen.Login.route
     }
 
 }

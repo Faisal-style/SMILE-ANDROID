@@ -1,5 +1,6 @@
 package com.example.smiletryone.screen.detail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +26,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.smiletryone.R
+import com.example.smiletryone.component.GifSmile
 import com.example.smiletryone.data.remote.responses.DetailUserResponse
 import com.example.smiletryone.navigation.Screen
 import com.example.smiletryone.ui.theme.Monda_Regular
@@ -43,75 +45,86 @@ fun DetailUserScreen(
         produceState<Resource<DetailUserResponse>>(initialValue = Resource.Loading()) {
             value = homeViewModel.getUserDetailInfo()
         }.value
-    val name = detailUserInfo.data?.data?.fullName
-    val email = detailUserInfo.data?.data?.email
+    val name = detailUserInfo.data?.userResult?.userName
+    val email = detailUserInfo.data?.userResult?.email
     var image by rememberSaveable {
         mutableStateOf("https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?w=2000")
     }
-    if (detailUserInfo.data?.data?.image != null){
-        image = detailUserInfo.data.data.image.toString()
+    val isLoading by remember { homeViewModel.isLoading }
+    if (detailUserInfo.data?.userResult?.image != null) {
+        image = detailUserInfo.data.userResult.image
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                onBackClick = {
-                    navController.popBackStack()
-                    navController.navigate(Screen.Home.route)
-                }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = modifier.size(30.dp))
-            AsyncImage(
-                model = image,
-                contentDescription = "Avatar Image",
-                contentScale = ContentScale.Crop,
+    Box() {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    onBackClick = {
+                        navController.popBackStack()
+                        navController.navigate(Screen.Home.route)
+                    }
+                )
+            }
+        ) { paddingValues ->
+            Column(
                 modifier = Modifier
-                    .size(200.dp)
-                    .clip(CircleShape)
-            )
-            Spacer(modifier = Modifier.size(30.dp))
-            if (name != null) {
-                Text(
-                    text = name,
-                    fontFamily = Monda_Regular,
-                    fontSize = 30.sp,
-                    color = Color.Black
-                )
-            }
-            Spacer(modifier = Modifier.size(30.dp))
-            if (email != null) {
-                Text(
-                    text = email,
-                    fontFamily = Monda_Regular,
-                    fontSize = 15.sp,
-                    color = Color.Black
-                )
-            }
-            Spacer(modifier = Modifier.size(50.dp))
-            Button(
-                onClick = { /*TODO*/ },
-                modifier = Modifier,
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)
+                    .padding(paddingValues)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Logout",
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(start = 20.dp, end = 20.dp),
-                    color = Color.White
+                Spacer(modifier = modifier.size(30.dp))
+                AsyncImage(
+                    model = image,
+                    contentDescription = "Avatar Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(CircleShape)
                 )
+                Spacer(modifier = Modifier.size(30.dp))
+                if (name != null) {
+                    Text(
+                        text = name,
+                        fontFamily = Monda_Regular,
+                        fontSize = 30.sp,
+                        color = Color.Black
+                    )
+                }
+                Spacer(modifier = Modifier.size(30.dp))
+                if (email != null) {
+                    Text(
+                        text = email,
+                        fontFamily = Monda_Regular,
+                        fontSize = 15.sp,
+                        color = Color.Black
+                    )
+                }
+                Spacer(modifier = Modifier.size(50.dp))
+                Button(
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier,
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)
+                ) {
+                    Text(
+                        text = "Logout",
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(start = 20.dp, end = 20.dp),
+                        color = Color.White
+                    )
+                }
             }
         }
-
-
+        if (isLoading){
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                GifSmile(modifier = Modifier.size(100.dp))
+            }
+        }
     }
 }
 

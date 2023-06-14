@@ -13,5 +13,8 @@
     <color name="splash_color">#3CA1C1</color>
     <color name="textFieldColor">#D9D9D9</color>
 
+    <color name="history_card">#1C4380</color>
+    <color name="logo_login_color">#013185</color>
+
 
 </resources>

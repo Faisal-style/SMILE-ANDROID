@@ -1,6 +1,7 @@
 package com.example.smiletryone.screen.register
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
@@ -12,6 +13,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -23,6 +25,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.smiletryone.R
 import com.example.smiletryone.component.CustomButton
+import com.example.smiletryone.component.GifSmile
 import com.example.smiletryone.component.TextFieldComponent
 import com.example.smiletryone.component.TextFieldPasswordComponent
 import com.example.smiletryone.navigation.Screen
@@ -52,118 +55,135 @@ fun RegisterScreen(
     var passwordTextField2 by rememberSaveable {
         mutableStateOf("")
     }
+    val isLoading by remember { registerViewModel.isLoading }
     var snackbarVisible by remember { mutableStateOf(false) }
     var snackbarMessage by remember { mutableStateOf("Email atau Password Salah") }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        content = { paddingValues ->
-            Box(
-                modifier = modifier
-                    .fillMaxSize()
-                    .paint(
-                        painter = painterResource(id = R.drawable.img),
-                        contentScale = ContentScale.FillBounds
-                    )
-                    .padding(paddingValues)
-            ) {
-                Column(
-                    modifier = Modifier
+    Box(modifier = modifier.fillMaxSize()) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            content = { paddingValues ->
+                Box(
+                    modifier = modifier
                         .fillMaxSize()
-                        .imePadding(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                        .paint(
+                            painter = painterResource(id = R.drawable.img),
+                            contentScale = ContentScale.FillBounds
+                        )
+                        .padding(paddingValues)
                 ) {
-                    RegisterTitle()
-                    Spacer(modifier = Modifier.size(30.dp))
                     Column(
-                        modifier = modifier,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .imePadding(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
+                        RegisterTitle()
+                        Spacer(modifier = Modifier.size(30.dp))
+                        Column(
+                            modifier = modifier,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
 
-                        TextFieldComponent(
-                            state = emailTextField,
-                            placeholder = "Email",
-                            onValueChange = { newValue -> emailTextField = newValue })
+                            TextFieldComponent(
+                                state = emailTextField,
+                                placeholder = "Email",
+                                onValueChange = { newValue -> emailTextField = newValue })
 
-                        Spacer(modifier = Modifier.size(8.dp))
+                            Spacer(modifier = Modifier.size(8.dp))
 
-                        TextFieldComponent(
-                            state = usernameTextField,
-                            placeholder = "Username",
-                            onValueChange = { newValue -> usernameTextField = newValue })
+                            TextFieldComponent(
+                                state = usernameTextField,
+                                placeholder = "Username",
+                                onValueChange = { newValue -> usernameTextField = newValue })
 
-                        Spacer(modifier = Modifier.size(8.dp))
+                            Spacer(modifier = Modifier.size(8.dp))
 
-                        TextFieldPasswordComponent(
-                            state = passwordTextField,
-                            onValueChange = { newPasswordValue ->
-                                passwordTextField = newPasswordValue
-                            },
-                            placeholder = "Password"
-                        )
+                            TextFieldPasswordComponent(
+                                state = passwordTextField,
+                                onValueChange = { newPasswordValue ->
+                                    passwordTextField = newPasswordValue
+                                },
+                                placeholder = "Password"
+                            )
 
-                        Spacer(modifier = Modifier.size(8.dp))
+                            Spacer(modifier = Modifier.size(8.dp))
 
-                        TextFieldPasswordComponent(
-                            state = passwordTextField2,
-                            onValueChange = { newPasswordValue ->
-                                passwordTextField2 = newPasswordValue
-                            },
-                            placeholder = "Password"
-                        )
+                            TextFieldPasswordComponent(
+                                state = passwordTextField2,
+                                onValueChange = { newPasswordValue ->
+                                    passwordTextField2 = newPasswordValue
+                                },
+                                placeholder = "Password"
+                            )
 
-                        Spacer(modifier = Modifier.size(8.dp))
+                            Spacer(modifier = Modifier.size(8.dp))
 
-                        CustomButton(text = "Register") {
-                            registerViewModel.viewModelScope.launch {
-                                if (passwordTextField != passwordTextField2) {
-                                    snackbarMessage = "Password Tidak Sama"
-                                    snackbarVisible = true
-                                    delay(1000)
-                                    snackbarVisible = false
-                                }else{
-                                    val getRegister = registerViewModel.getRegisterInfo(emailTextField, passwordTextField, usernameTextField)
-                                    if (getRegister is Resource.Success){
-                                        snackbarMessage = "Register Berhasil"
+                            CustomButton(text = "Register") {
+                                registerViewModel.viewModelScope.launch {
+                                    if (passwordTextField != passwordTextField2) {
+                                        snackbarMessage = "Password Tidak Sama"
                                         snackbarVisible = true
                                         delay(1000)
                                         snackbarVisible = false
-                                        navController.navigate(Screen.Login.route)
-                                    }else{
-                                        snackbarMessage = "Register Gagal"
-                                        snackbarVisible = true
-                                        delay(1000)
-                                        snackbarVisible = false
+                                    } else {
+                                        val getRegister = registerViewModel.getRegisterInfo(
+                                            emailTextField,
+                                            passwordTextField,
+                                            usernameTextField
+                                        )
+                                        if (getRegister is Resource.Success) {
+                                            snackbarMessage = "Register Berhasil"
+                                            snackbarVisible = true
+                                            delay(1000)
+                                            snackbarVisible = false
+                                            navController.navigate(Screen.Login.route)
+                                        } else {
+                                            snackbarMessage = "Register Gagal"
+                                            snackbarVisible = true
+                                            delay(1000)
+                                            snackbarVisible = false
+                                        }
                                     }
                                 }
-                            }
 
+                            }
+                        }
+                        Spacer(modifier = Modifier.size(10.dp))
+                        SignIn() {
+                            navController.navigate(Screen.Login.route)
                         }
                     }
-                    Spacer(modifier = Modifier.size(10.dp))
-                    SignIn() {
-                        navController.navigate(Screen.Login.route)
+                }
+            },
+            snackbarHost = {
+                if (snackbarVisible) {
+                    Snackbar(
+                        modifier = Modifier.padding(8.dp),
+                        action = {
+                            TextButton(onClick = { snackbarVisible = false }) {
+                                Text(text = "OK")
+                            }
+                        }
+                    ) {
+                        Text(text = snackbarMessage)
                     }
                 }
             }
-        },
-        snackbarHost = {
-            if (snackbarVisible) {
-                Snackbar(
-                    modifier = Modifier.padding(8.dp),
-                    action = {
-                        TextButton(onClick = { snackbarVisible = false }) {
-                            Text(text = "OK")
-                        }
-                    }
-                ) {
-                    Text(text = snackbarMessage)
-                }
+        )
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .wrapContentSize(Alignment.Center)
+            ) {
+                GifSmile(modifier = Modifier.size(100.dp))
             }
         }
-    )
+    }
 
 }
 
@@ -179,7 +199,7 @@ fun RegisterTitle(modifier: Modifier = Modifier) {
             fontSize = 40.sp
         )
         Image(
-            painter = painterResource(id = R.drawable.login_image),
+            painter = painterResource(id = R.drawable.logo_only),
             contentDescription = "Register Image",
             modifier = Modifier
                 .width(180.dp)
@@ -188,60 +208,6 @@ fun RegisterTitle(modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-fun InputField(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        var emailTextField by rememberSaveable {
-            mutableStateOf("")
-        }
-        var usernameTextField by rememberSaveable {
-            mutableStateOf("")
-        }
-        var passwordTextField by rememberSaveable {
-            mutableStateOf("")
-        }
-        var passwordTextField2 by rememberSaveable {
-            mutableStateOf("")
-        }
-        TextFieldComponent(
-            state = emailTextField,
-            placeholder = "Email",
-            onValueChange = { newValue -> emailTextField = newValue })
-
-        Spacer(modifier = Modifier.size(8.dp))
-
-        TextFieldComponent(
-            state = usernameTextField,
-            placeholder = "Username",
-            onValueChange = { newValue -> usernameTextField = newValue })
-
-        Spacer(modifier = Modifier.size(8.dp))
-
-        TextFieldPasswordComponent(
-            state = passwordTextField,
-            onValueChange = { newPasswordValue -> passwordTextField = newPasswordValue },
-            placeholder = "Password"
-        )
-
-        Spacer(modifier = Modifier.size(8.dp))
-
-        TextFieldPasswordComponent(
-            state = passwordTextField2,
-            onValueChange = { newPasswordValue -> passwordTextField2 = newPasswordValue },
-            placeholder = "Password"
-        )
-
-        Spacer(modifier = Modifier.size(8.dp))
-
-        CustomButton(text = "Register") {
-            println("Login Text $emailTextField")
-        }
-    }
-}
 
 @Composable
 fun SignIn(modifier: Modifier = Modifier, navigateToLogin: () -> Unit) {

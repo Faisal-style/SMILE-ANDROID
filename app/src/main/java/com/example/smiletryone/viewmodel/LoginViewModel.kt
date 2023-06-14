@@ -12,6 +12,7 @@ import com.example.smiletryone.repository.SmileRepository
 import com.example.smiletryone.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -49,15 +50,10 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun saveUserId(id: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            dataRepository.saveUserId(id = id)
-        }
-    }
-
     suspend fun getLoginInfo(email: String, password: String) {
         isLoading.value = true
         val result = smileRepository.getLogin(email, password)
+        delay(1000)
         when (result) {
             is Resource.Success -> {
                 loginData.value = result.data

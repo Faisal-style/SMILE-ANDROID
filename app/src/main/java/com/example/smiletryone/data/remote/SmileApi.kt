@@ -1,7 +1,7 @@
 package com.example.smiletryone.data.remote
 
 import com.example.smiletryone.data.remote.responses.*
-import retrofit2.Call
+import retrofit2.http.DELETE
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -26,21 +26,39 @@ interface SmileApi {
         @Field("userName") username: String
     ): RegisterResponse
 
-    @GET("user/{id}")
+    @GET("user/detail")
     suspend fun postDetailUser(
         @Header("Authorization") token: String,
-        @Path("id") id: String,
     ): DetailUserResponse
 
     @FormUrlEncoded
-    @POST("chat")
+    @POST("conversation/chat/{conversationId}")
     suspend fun sendChat(
         @Header("Authorization") token: String,
+        @Path("conversationId") conversationId : String,
         @Field("question") question: String
-    ): ChatResponse
+    ): SendChatResponse
 
-    @GET("chat")
+    @GET("conversation/chat/{conversationId}")
     suspend fun getChat(
         @Header("Authorization") token: String,
+        @Path("conversationId") conversationId: String
     ): GetChatResponse
+
+    @POST("conversation")
+    suspend fun createConversation(
+        @Header("Authorization") token: String
+    ): CreateConversationResponse
+
+    @GET("conversation")
+    suspend fun getConversation(
+        @Header("Authorization") token: String
+    ): GetConversationResponse
+
+    @DELETE("conversation/{conversationId}")
+    suspend fun deleteConversation(
+        @Header("Authorization") token: String,
+        @Path("conversationId") conversationId: String
+    ): DeleteConversationResponse
+
 }
