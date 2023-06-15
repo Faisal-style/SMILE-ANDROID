@@ -1,4 +1,4 @@
-# :lion: SMILE (Support and Mental Insight for Life Empowerment) (In Progress)
+# :smile: SMILE (Support and Mental Insight for Life Empowerment) (In Progress)
 
 > _This README is written by faisal_
 
