@@ -31,7 +31,6 @@ import com.example.smiletryone.ui.theme.Monda_Regular
 import com.example.smiletryone.ui.theme.PurplePurse
 import com.example.smiletryone.util.Resource
 import com.example.smiletryone.viewmodel.HomeViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -66,10 +65,9 @@ fun MyNavDrawerContent(
         mutableStateOf("https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?w=2000")
     }
     if (detailUserInfo.data?.userResult?.image != null) {
-        image = detailUserInfo.data.userResult.image.toString()
+        image = detailUserInfo.data.userResult.image
     }
     val scope = rememberCoroutineScope()
-    val isLoading by remember { homeViewModel.isLoading }
     val items = listOf(
         MenuItem(
             title = stringResource(id = R.string.profile),

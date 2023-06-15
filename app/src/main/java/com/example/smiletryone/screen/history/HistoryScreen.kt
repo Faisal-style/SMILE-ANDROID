@@ -38,7 +38,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun HistoryScreen(navController: NavController, chatViewModel: ChatViewModel = hiltViewModel()) {
     BackHandler() {
-        navController.navigate(Screen.Home.route)
+        navController.navigate(Screen.Home.route){
+            popUpTo(navController.graph.id){
+                inclusive = true
+            }
+        }
     }
     val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
@@ -56,8 +60,7 @@ fun HistoryScreen(navController: NavController, chatViewModel: ChatViewModel = h
             topBar = {
                 TopAppBar(
                     onBackClick = {
-                        navController.popBackStack()
-                        navController.clearBackStack(Screen.Home.route)
+                        navController.navigate(Screen.Home.route)
                     }
                 )
             },
@@ -94,7 +97,6 @@ fun HistoryScreen(navController: NavController, chatViewModel: ChatViewModel = h
                         ConversationItem(text = conversationItem.title,
                             onConversationClicked = {
                                 chatViewModel.saveConversationId(conversationItem.id)
-                                navController.popBackStack()
                                 navController.navigate(Screen.Home.route)
                             },
                             onDeleteClicked = {

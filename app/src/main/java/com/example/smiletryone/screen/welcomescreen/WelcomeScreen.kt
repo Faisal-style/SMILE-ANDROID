@@ -2,16 +2,13 @@ package com.example.smiletryone.screen.welcomescreen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
@@ -23,10 +20,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.smiletryone.util.OnBoardingPage
 import com.example.smiletryone.R
+import com.example.smiletryone.component.SplashRobotFirst
 import com.example.smiletryone.navigation.Screen
 import com.example.smiletryone.ui.theme.Poppins_Bold
 import com.example.smiletryone.ui.theme.Poppins_Medium
@@ -68,7 +65,7 @@ fun WelcomeScreen(
             }
             HorizontalPagerIndicator(
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
+                    .align(CenterHorizontally)
                     .weight(1f),
                 pagerState = pagerState,
             )
@@ -107,14 +104,7 @@ fun PagerScreen(onBoardingPage: OnBoardingPage) {
             fontFamily = Poppins_Medium,
             color = Color.Black
         )
-        Image(
-            painter = painterResource(id = onBoardingPage.image),
-            contentDescription = null,
-            modifier = Modifier
-                .align(CenterHorizontally)
-                .padding(top = 77.dp)
-                .size(316.dp),
-        )
+        SplashRobotFirst(drawable = onBoardingPage.image)
     }
 }
 
@@ -127,7 +117,7 @@ fun FinishButton(
     onClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = 80.dp),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.Center

@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.smiletryone.data.DataStoreRepository
 import com.example.smiletryone.navigation.Screen
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

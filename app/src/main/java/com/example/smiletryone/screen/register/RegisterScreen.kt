@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.smiletryone.R
 import com.example.smiletryone.component.CustomButton
@@ -29,8 +28,6 @@ import com.example.smiletryone.component.GifSmile
 import com.example.smiletryone.component.TextFieldComponent
 import com.example.smiletryone.component.TextFieldPasswordComponent
 import com.example.smiletryone.navigation.Screen
-import com.example.smiletryone.screen.login.LoginTitle
-import com.example.smiletryone.screen.login.SignUp
 import com.example.smiletryone.ui.theme.PurplePurse
 import com.example.smiletryone.util.Resource
 import com.example.smiletryone.viewmodel.RegisterViewModel
@@ -188,7 +185,7 @@ fun RegisterScreen(
 }
 
 @Composable
-fun RegisterTitle(modifier: Modifier = Modifier) {
+fun RegisterTitle() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

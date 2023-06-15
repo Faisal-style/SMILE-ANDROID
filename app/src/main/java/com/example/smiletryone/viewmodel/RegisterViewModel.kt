@@ -2,7 +2,6 @@ package com.example.smiletryone.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.smiletryone.data.remote.responses.LoginResponse
 import com.example.smiletryone.data.remote.responses.RegisterResponse
 import com.example.smiletryone.repository.SmileRepository
 import com.example.smiletryone.util.Resource

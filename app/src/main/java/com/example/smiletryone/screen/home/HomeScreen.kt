@@ -1,6 +1,7 @@
 package com.example.smiletryone.screen.home
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,7 +27,6 @@ import com.example.smiletryone.data.remote.responses.ChatResultItem
 import com.example.smiletryone.ui.theme.BackGroundMessageBot
 import com.example.smiletryone.ui.theme.BackGroundMessageHuman
 import com.example.smiletryone.ui.theme.ColorTextBot
-import com.example.smiletryone.ui.theme.ColorTextHuman
 import com.example.smiletryone.viewmodel.ChatViewModel
 import com.example.smiletryone.viewmodel.HomeViewModel
 
@@ -40,6 +40,9 @@ fun HomeScreen(
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     val isLoading by remember { homeViewModel.isLoading }
+    BackHandler() {
+        navController.popBackStack()
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         Scaffold(
@@ -54,7 +57,7 @@ fun HomeScreen(
                 )
             },
             drawerContent = {
-                MyNavDrawerContent(onItemSelected = { title ->
+                MyNavDrawerContent(onItemSelected = {
                     scope.launch {
                         scaffoldState.drawerState.close()
                     }
@@ -93,6 +96,7 @@ fun HomeScreen(
     }
 }
 
+
 const val ConversationTestTag = "ConversationTestTag"
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -101,8 +105,7 @@ fun MessageList(
     modifier: Modifier = Modifier,
     chatViewModel: ChatViewModel
 ) {
-    val scope = rememberCoroutineScope()
-    scope.launch {
+    LaunchedEffect(key1 = chatViewModel.userToken){
         if (chatViewModel.conversationId.value == null) {
             chatViewModel.newConversation()
         } else if (chatViewModel.conversationId.value == 0) {
@@ -110,7 +113,6 @@ fun MessageList(
         } else {
             chatViewModel.getChat()
         }
-
     }
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()

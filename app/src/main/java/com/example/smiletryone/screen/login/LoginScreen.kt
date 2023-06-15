@@ -1,7 +1,6 @@
 package com.example.smiletryone.screen.login
 
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,7 +57,11 @@ fun LoginScreen(
 
     LaunchedEffect(key1 = token) {
         if (token.isNotBlank()) {
-            navController.navigate(homeDestination)
+            navController.navigate(homeDestination){
+                popUpTo(navController.graph.id){
+                    inclusive = true
+                }
+            }
         }
     }
     Box(modifier = modifier.fillMaxSize()) {
@@ -157,7 +160,7 @@ fun LoginScreen(
 
 
 @Composable
-fun LoginTitle(modifier: Modifier = Modifier) {
+fun LoginTitle() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

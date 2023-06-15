@@ -1,16 +1,13 @@
 package com.example.smiletryone.viewmodel
 
-import android.os.Message
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.smiletryone.data.DataStoreRepository
-import com.example.smiletryone.data.remote.responses.ChatResult
 import com.example.smiletryone.data.remote.responses.ChatResultItem
 import com.example.smiletryone.data.remote.responses.DataConversation
-import com.example.smiletryone.data.remote.responses.GetChatResponse
 import com.example.smiletryone.repository.SmileRepository
 import com.example.smiletryone.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +24,7 @@ class ChatViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ) : ViewModel() {
     private val _userToken: MutableState<String> = mutableStateOf("")
-    private val userToken: State<String> = _userToken
+    val userToken: State<String> = _userToken
 
     private val _conversationId: MutableState<Int?> = mutableStateOf(null)
     val conversationId: State<Int?> = _conversationId
@@ -36,14 +33,15 @@ class ChatViewModel @Inject constructor(
     val chatItems: StateFlow<List<ChatResultItem>> = _chatItems.asStateFlow()
 
     private val _deleteMessage: MutableState<String> = mutableStateOf("")
-    private val deleteMessage: State<String> = _deleteMessage
 
     private val _conversationItems: MutableStateFlow<MutableList<DataConversation>> =
         MutableStateFlow(mutableListOf())
     val conversationItems: StateFlow<MutableList<DataConversation>> = _conversationItems.asStateFlow()
 
-
     var isLoading = mutableStateOf(false)
+
+    var isError = mutableStateOf(false)
+
 
 
     init {
@@ -95,8 +93,6 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             isLoading.value = true
             val response = smileRepository.createConversation("Bearer ${userToken.value}")
-            delay(1500)
-            isLoading.value = false
             when (response) {
                 is Resource.Success -> {
                     _conversationId.value = response.data?.data?.id
@@ -104,6 +100,8 @@ class ChatViewModel @Inject constructor(
                 }
                 else -> {}
             }
+            delay(3000)
+            isLoading.value = false
         }
     }
 
@@ -164,6 +162,9 @@ class ChatViewModel @Inject constructor(
                             _chatItems.value = updatedChatItems
                         }
                     }
+                }
+                is Resource.Error -> {
+                    isError.value = true
                 }
                 else -> {}
             }

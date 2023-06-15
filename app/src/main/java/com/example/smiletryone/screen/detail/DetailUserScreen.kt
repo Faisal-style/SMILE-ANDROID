@@ -1,5 +1,6 @@
 package com.example.smiletryone.screen.detail
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -17,12 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.smiletryone.R
@@ -33,7 +32,6 @@ import com.example.smiletryone.ui.theme.Monda_Regular
 import com.example.smiletryone.ui.theme.PurplePurse
 import com.example.smiletryone.util.Resource
 import com.example.smiletryone.viewmodel.HomeViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 @Composable
 fun DetailUserScreen(
@@ -41,6 +39,13 @@ fun DetailUserScreen(
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
+    BackHandler() {
+        navController.navigate(Screen.Home.route){
+            popUpTo(navController.graph.id){
+                inclusive = true
+            }
+        }
+    }
     val detailUserInfo =
         produceState<Resource<DetailUserResponse>>(initialValue = Resource.Loading()) {
             value = homeViewModel.getUserDetailInfo()
