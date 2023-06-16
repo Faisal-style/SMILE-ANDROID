@@ -180,7 +180,7 @@ fun HumanMessageCard(message: ChatResultItem) {
 fun BotMessageCard(message: ChatResultItem) {
     if (message.reply == "") {
         Text(
-            text = "Let me thinking........",
+            text = "Biarkan aku berpikir sebentar ya...",
             fontSize = 14.sp,
             color = ColorTextBot,
             modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp),

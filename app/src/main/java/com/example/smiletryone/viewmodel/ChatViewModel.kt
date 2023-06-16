@@ -164,6 +164,19 @@ class ChatViewModel @Inject constructor(
                     }
                 }
                 is Resource.Error -> {
+                    val lastIndex = _chatItems.value.lastIndex
+                    if (lastIndex >= 0) {
+                        val updatedItem = _chatItems.value[lastIndex].copy(
+                            updatedAt = "",
+                            question = message,
+                            idConversation = 10000,
+                            reply = "Mungkin koneksi kamu sedang bermasalah, tolong cek koneksimu kembali ya",
+                            id = 10000
+                        )
+                        val updatedChatItems = _chatItems.value.toMutableList()
+                        updatedChatItems[lastIndex] = updatedItem
+                        _chatItems.value = updatedChatItems
+                    }
                     isError.value = true
                 }
                 else -> {}
